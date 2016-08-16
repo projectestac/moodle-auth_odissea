@@ -31,6 +31,7 @@ class auth_plugin_odissea extends auth_plugin_base {
         $this->pluginconfig = 'auth/' . $this->authtype;
         $this->config = get_config($this->pluginconfig);
         $this->errorlogtag = '[AUTH ODISSEA] ';
+        $this->ldapconns = 0;
 
         if (empty($this->config->objectclass)) {
             // Can't send empty filter
@@ -199,12 +200,12 @@ class auth_plugin_odissea extends auth_plugin_base {
                     if ($value == $this->config->nif_attribute || $value == $this->config->gicar_nif_attribute) {
                         $entry[$value][0] = str_replace(' ', '', $entry[$value][0]);
                     }
-                    $newval = textlib::convert($entry[$value][0], $this->config->ldapencoding, 'utf-8');
+                    $newval = core_text::convert($entry[$value][0], $this->config->ldapencoding, 'utf-8');
                 } else {
                     if ($value == $this->config->nif_attribute || $value == $this->config->gicar_nif_attribute) {
                         $entry[$value] = str_replace(' ', '', $entry[$value]);
                     }
-                    $newval = textlib::convert($entry[$value], $this->config->ldapencoding, 'utf-8');
+                    $newval = core_text::convert($entry[$value], $this->config->ldapencoding, 'utf-8');
                 }
                 if (!empty($newval)) { // favour ldap entries that are set
                     $ldapval = $newval;
@@ -358,23 +359,23 @@ class auth_plugin_odissea extends auth_plugin_base {
 
         // Try to remove duplicates before storing the contexts (to avoid problems in sync_users()).
         $config->contexts = explode(';', $config->contexts);
-        $config->contexts = array_map(create_function('$x', 'return textlib::strtolower(trim($x));'), $config->contexts);
+        $config->contexts = array_map(create_function('$x', 'return core_text::strtolower(trim($x));'), $config->contexts);
         $config->contexts = implode(';', array_unique($config->contexts));
 
         $config->gicar_contexts = explode(';', $config->gicar_contexts);
-        $config->gicar_contexts = array_map(create_function('$x', 'return textlib::strtolower(trim($x));'), $config->gicar_contexts);
+        $config->gicar_contexts = array_map(create_function('$x', 'return core_text::strtolower(trim($x));'), $config->gicar_contexts);
         $config->gicar_contexts = implode(';', array_unique($config->gicar_contexts));
 
         // Save common settings
-        set_config('user_type', textlib::strtolower(trim($config->user_type)), $this->pluginconfig);
+        set_config('user_type', core_text::strtolower(trim($config->user_type)), $this->pluginconfig);
         set_config('opt_deref', $config->opt_deref, $this->pluginconfig);
         set_config('search_sub', $config->search_sub, $this->pluginconfig);
         // Save XTEC settings
         set_config('host_url', trim($config->host_url), $this->pluginconfig);
         set_config('ldapencoding', trim($config->ldapencoding), $this->pluginconfig);
         set_config('ldap_version', $config->ldap_version, $this->pluginconfig);
-        set_config('user_attribute', textlib::strtolower(trim($config->user_attribute)), $this->pluginconfig);
-        set_config('nif_attribute', textlib::strtolower(trim($config->nif_attribute)), $this->pluginconfig);
+        set_config('user_attribute', core_text::strtolower(trim($config->user_attribute)), $this->pluginconfig);
+        set_config('nif_attribute', core_text::strtolower(trim($config->nif_attribute)), $this->pluginconfig);
         set_config('contexts', $config->contexts, $this->pluginconfig);
         set_config('bind_dn', trim($config->bind_dn), $this->pluginconfig);
         set_config('bind_pw', $config->bind_pw, $this->pluginconfig);
@@ -382,8 +383,8 @@ class auth_plugin_odissea extends auth_plugin_base {
         set_config('gicar_host_url', trim($config->gicar_host_url), $this->pluginconfig);
         set_config('gicar_ldapencoding', trim($config->gicar_ldapencoding), $this->pluginconfig);
         set_config('gicar_ldap_version', $config->gicar_ldap_version, $this->pluginconfig);
-        set_config('gicar_user_attribute', textlib::strtolower(trim($config->gicar_user_attribute)), $this->pluginconfig);
-        set_config('gicar_nif_attribute', textlib::strtolower(trim($config->gicar_nif_attribute)), $this->pluginconfig);
+        set_config('gicar_user_attribute', core_text::strtolower(trim($config->gicar_user_attribute)), $this->pluginconfig);
+        set_config('gicar_nif_attribute', core_text::strtolower(trim($config->gicar_nif_attribute)), $this->pluginconfig);
         set_config('gicar_contexts', $config->gicar_contexts, $this->pluginconfig);
         set_config('gicar_bind_dn', trim($config->gicar_bind_dn), $this->pluginconfig);
         set_config('gicar_bind_pw', $config->gicar_bind_pw, $this->pluginconfig);
@@ -474,13 +475,13 @@ class auth_plugin_odissea extends auth_plugin_base {
         $moodleattributes = array();
         foreach ($this->userfields as $field) {
             if (!empty($this->config->{"field_map_$field"})) {
-                $moodleattributes[$field] = textlib::strtolower(trim($this->config->{"field_map_$field"}));
+                $moodleattributes[$field] = core_text::strtolower(trim($this->config->{"field_map_$field"}));
                 if (preg_match('/,/', $moodleattributes[$field])) {
                     $moodleattributes[$field] = explode(',', $moodleattributes[$field]); // split ?
                 }
             }
         }
-        $moodleattributes['username'] = textlib::strtolower(trim($nif_attribute));
+        $moodleattributes['username'] = core_text::strtolower(trim($nif_attribute));
         return $moodleattributes;
     }
 

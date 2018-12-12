@@ -13,18 +13,29 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * Version information
+ * Privacy Subsystem implementation for auth_odissea.
  *
  * @package    auth_odissea
- * @author     Sara Arjona
- * @author     Salva Valldeoriola
+ * @copyright  2018 Salva Valldeoriola <svallde2@xtec.cat>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace auth_odissea\privacy;
 defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2017111302;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2017110800;        // Requires this Moodle version.
-$plugin->component = 'auth_odissea';    // Full name of the plugin (used for diagnostics).
+/**
+ * Privacy Subsystem for auth_odissea implementing null_provider.
+ *
+ * @copyright  2018 Salva Valldeoriola <svallde2@ctec.cat>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
+}
